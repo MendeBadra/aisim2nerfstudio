@@ -1,3 +1,14 @@
+"""
+[WARNING] This script is deprecated.
+This script originally was used to mask out an object in the camera view by using 1 reference frame that has been annotated by me in photopea.
+But it turned out nerfstudio don't like RGBA format and it had a data convention to have seperate masks folder with the masks images which should be
+specified in the "frames" field of the transforms.json file. So this approach is not needed.
+
+"""
+
+
+
+
 from pathlib import Path
 import matplotlib.pyplot as plt
 from tqdm import tqdm

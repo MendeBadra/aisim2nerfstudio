@@ -1,3 +1,8 @@
+"""
+This script writes the transforms.json
+"""
+
+
 import json
 from pathlib import Path
 import numpy as np
@@ -8,7 +13,16 @@ from tqdm import tqdm
 # We will use a standard numpy (row-major) convention for readability, 
 # and ensure the final translation is in the 4th row (index 3).
 CAMERA_TYPE = "pinhole"
+# CAMERA_TYPE = "pinhole_duplicate0" 
+
+# CAMERA_TYPE = "pinhole_duplicate1"
+# CAMERA_TYPE = "pinhole_duplicate2"
 GPS_VEHICLE_SENSOR_DATASET = "2025-12-04_18-22-25"
+
+CAMERA_CALIBRATION_FILE = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
+# OUTPUT_DIR = "outputs/test0" # 2025.12.17 The fix needed
+OUTPUT_DIR = "outputs"
+TEST_NUM = 1
 # CAMERA_TYPE = "pinhole_duplicate0"
 
 def get_intrinsic_params(camera_calibration_file, camera_type = CAMERA_TYPE):
@@ -43,7 +57,7 @@ def get_intrinsic_params(camera_calibration_file, camera_type = CAMERA_TYPE):
 
     output = {
         # General parameters
-        "camera_model": camera_config['model'],
+        "camera_model": "OPENCV" if camera_config['model'] == "OpenCVPinhole" else "Undefined", # NERFSTUDIO: camera model type [OPENCV, OPENCV_FISHEYE]
         "w": camera_config['width'],
         "h": camera_config['height'],
         
@@ -64,34 +78,31 @@ def get_intrinsic_params(camera_calibration_file, camera_type = CAMERA_TYPE):
     
     return output
 
-
-def get_sensor_position_rotation(input_data_path):
-     with open(input_data_path, 'r') as f:
+def get_sensor_position_rotation(camera_calibration_file):
+     with open(camera_calibration_file, 'r') as f:
         input_data = json.load(f)
     # 1. Navigate to the core camera configuration block
         try:
-            camera_config = input_data['sensors']['pinhole']['camera_config']
-            position = camera_config['position']
-            rotation = camera_config['rotation']
+            camera_config = input_data['sensors'][CAMERA_TYPE]['camera_config']
+            relative_sensor_position = camera_config['position'] # this is body space position. Is not the absolute position
+            relative_sensor_rotation = camera_config['rotation']
             
         except KeyError as e:
             print(f"Error: Missing expected key in the JSON structure: {e}")
             return None
         
-        return position, rotation
+        return relative_sensor_position, relative_sensor_rotation
 
 def get_rt_transform(file_path):
     with open(file_path, 'r') as f:
         vehicle_sensor_data = json.load(f)
 
-    return vehicle_sensor_data["ego_motion"]["rt_transform"]
-
-        
+    return vehicle_sensor_data["ego_motion"]["rt_transform"]     
 
 def euler_zyx_to_matrix(yaw_rad, pitch_rad, roll_rad):
     """
     Converts Euler ZYX (Yaw, Pitch, Roll) angles to a 4x4 rotation matrix.
-    Note: This uses the rotation matrix definitions provided in the GLM code.
+    Note: See the aiSim documentation Coordinate transforms page. This is Python version of the Cpp code in the documentation
     """
     sin_z, cos_z = math.sin(yaw_rad), math.cos(yaw_rad)
     sin_y, cos_y = math.sin(pitch_rad), math.cos(pitch_rad)
@@ -158,7 +169,7 @@ def calculate_pom_deg(position, yaw_deg, pitch_deg, roll_deg):
     
     return pom
 
-def load_ego_pom_from_rt_transform(rt_transform_array):
+def reshape_rt_transform(rt_transform_array):
     """
     Loads the Ego-POM from the 16-element rt_transform array.
     The documentation implies the array is already structured as the Ego POM.
@@ -176,7 +187,7 @@ def load_ego_pom_from_rt_transform(rt_transform_array):
     #  R20, R21, R22, 0.0,
     #  Tx, Ty, Tz, 1.0
     # ]
-    ego_pom = np.array(rt_transform_array).reshape((4, 4))
+    ego_pom = np.array(rt_transform_array).reshape((4, 4), order='F')
     return ego_pom
 
 # ... (Your previous calculate_pom_deg and load_ego_pom_from_rt_transform functions)
@@ -194,42 +205,46 @@ def create_nerfstudio_conversion_matrix():
     return T_conversion
 
 def calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file):
-    """transform matrix like in the nerfstudio"""
+    """transform matrix like in the nerfstudio transforms.json
+    NOTE: This is the main function that uses all of the functions defined."""
     # camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
-    pos, rot = get_sensor_position_rotation(camera_calibration_file)
+    sensor_pos, sensor_rot = get_sensor_position_rotation(camera_calibration_file)
     # print(pos, rot)
-    yaw, pitch, roll = rot['yaw'], rot['pitch'], rot['roll']
+    yaw, pitch, roll = sensor_rot['yaw'], sensor_rot['pitch'], sensor_rot['roll']
     
     # 
     rt_transform_arr = get_rt_transform(vehicle_sensor_file)
 
-    T_sensor_pom = calculate_pom_deg(pos, yaw, pitch, roll)
-    T_ego_pom = load_ego_pom_from_rt_transform(rt_transform_arr)
+    T_sensor_pom = calculate_pom_deg(sensor_pos, yaw, pitch, roll)
+    T_ego_pom = reshape_rt_transform(rt_transform_arr)
+    # print(f"T_ego_pom = \n {T_ego_pom}")
     T_w2c = T_ego_pom @ T_sensor_pom
     T_conversion = create_nerfstudio_conversion_matrix()
     
     # Final matrix: T_w2c @ T_conversion
     T_c2w_ns = T_w2c @ T_conversion
     
-    return T_c2w_ns.T  # T for the ns representation
+    return T_c2w_ns  # T for the ns representation
 
-
-if __name__ == "__main__":
-    """In this section we want to write the transforms.json"""
     
-
-    # TEST
-    # camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
-    # vehicle_sensor_file = "C:/Users/Labor/Documents/MendeFolder/quick_poly_crop/2025-12-04_18-22-25/ego/vehicle_sensor/vehicle_sensor_00000.json"
+# def main():
+    # TEST - for a single example
+    # camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json" # the calibration file
+    # vehicle_sensor_file = "C:/Users/Labor/Documents/MendeFolder/quick_poly_crop/2025-12-04_18-22-25/ego/vehicle_sensor/vehicle_sensor_00000.json" # single example file
     # print(calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file))
 
-    # DEV
-    camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
-    intrinsic_params = get_intrinsic_params(camera_calibration_file)
+def main():
+    # DEV - for a big folder
+    output_dir = Path(OUTPUT_DIR)
+    output_file_path = output_dir / f"transforms_{CAMERA_TYPE}_test{TEST_NUM}.json"
+    print(f"[INFO] Output path is {str(output_file_path)}")
+    
+    intrinsic_params = get_intrinsic_params(CAMERA_CALIBRATION_FILE)
 
-    vehicle_sensor_files_path = Path("C:/Users/Labor/Documents/MendeFolder/quick_poly_crop/2025-12-04_18-22-25/ego/vehicle_sensor")
+    vehicle_sensor_files_path = Path("./data/2025-12-04_18-22-25/ego/vehicle_sensor") # for the whole car
     vehicle_sensor_files = list(vehicle_sensor_files_path.glob("vehicle_sensor*.json"))
-    print(len(vehicle_sensor_files))
+    # vehicle_sensor_files = vehicle_sensor_files[:1]
+    print(f"[INFO] We've got {len(vehicle_sensor_files)} files found for vehicle_sensor*.json")
     frames = []
 
     for vehicle_sensor_file in tqdm(vehicle_sensor_files):
@@ -240,19 +255,41 @@ if __name__ == "__main__":
         else:
             id_str = "N/A"
 
-        T_matrix = calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file)
+        T_matrix = calculate_ns_transform_matrix(CAMERA_CALIBRATION_FILE, vehicle_sensor_file)
         frame = {}
-        frame['file_path'] = f"images/frame_{id_str}.jpg" # supposing that we've converted all .tga images to .jpg
-        frame['mask_path'] = f"masks/mask_{id_str}.jpg"
+        frame['file_path'] = f"images/{CAMERA_TYPE}_{id_str}.jpg" # supposing that we've converted all .tga images to .jpg
+        frame['mask_path'] = f"masks/mask_{CAMERA_TYPE}_{id_str}.jpg" # mask path
         frame["transform_matrix"] = T_matrix.tolist()
         frame["colmap_im_id"] = int(id_str)
         frames.append(frame)
 
     transforms = intrinsic_params
     transforms["frames"] = frames
-    output_file_path = "transforms_test.json"
+    transforms["applied_transform"] = [
+        [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+        ],
+        [
+            -0.0,
+            -1.0,
+            -0.0,
+            -0.0
+        ]
+    ]
+    
     with open(output_file_path, 'w') as f:
         json.dump(transforms, f, indent=4)
     print("Done!")
 
-    
+
+if __name__ == "__main__":
+    main()
