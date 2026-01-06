@@ -12,8 +12,8 @@ from tqdm import tqdm
 # aiSim uses column-major matrix, where the translation vector is the 4th column (index 3).
 # We will use a standard numpy (row-major) convention for readability, 
 # and ensure the final translation is in the 4th row (index 3).
-CAMERA_TYPE = "pinhole"
-# CAMERA_TYPE = "pinhole_duplicate0" 
+CAMERA_TYPE = "pinhole" # forward
+# CAMERA_TYPE = "pinhole_duplicate0"
 
 # CAMERA_TYPE = "pinhole_duplicate1"
 # CAMERA_TYPE = "pinhole_duplicate2"
@@ -22,7 +22,7 @@ GPS_VEHICLE_SENSOR_DATASET = "2025-12-04_18-22-25"
 CAMERA_CALIBRATION_FILE = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
 # OUTPUT_DIR = "outputs/test0" # 2025.12.17 The fix needed
 OUTPUT_DIR = "outputs"
-TEST_NUM = 1
+TEST_NUM = 12
 # CAMERA_TYPE = "pinhole_duplicate0"
 
 def get_intrinsic_params(camera_calibration_file, camera_type = CAMERA_TYPE):
@@ -70,7 +70,7 @@ def get_intrinsic_params(camera_calibration_file, camera_type = CAMERA_TYPE):
         # Distortion coefficients
         "k1": k1,
         "k2": k2,
-        # "k3": k3,
+        "k3": k3,
         # "k4": k4,
         "p1": p1,
         "p2": p2,
@@ -162,10 +162,7 @@ def calculate_pom_deg(position, yaw_deg, pitch_deg, roll_deg):
     # Get the 4x4 rotation matrix
     pom = euler_zyx_to_matrix(yaw_rad, pitch_rad, roll_rad)
     
-    # The GLM code sets pom[3] (the 4th column in column-major, or 4th row in row-major) 
-    # to the position vector [x, y, z, 1.0].
-    # In row-major numpy, this is the last row (index 3).
-    pom[3, :3] = position
+    pom[:3, 3] = position # last column
     
     return pom
 
@@ -174,35 +171,137 @@ def reshape_rt_transform(rt_transform_array):
     Loads the Ego-POM from the 16-element rt_transform array.
     The documentation implies the array is already structured as the Ego POM.
     """
-    # Reshape the 16-element array into a 4x4 matrix. 
-    # Based on the documentation's structure (Forward, Left, Up, Position), 
-    # the data is likely stored in a row-major format, or the code handles a 
-    # column-major array by transposing during reshaping.
-    # We will assume row-major based on the observed position vector in the 4th block.
-    
-    # The matrix provided in your prompt:
-    # [
-    #  R00, R01, R02, 0.0,
-    #  R10, R11, R12, 0.0,
-    #  R20, R21, R22, 0.0,
-    #  Tx, Ty, Tz, 1.0
-    # ]
     ego_pom = np.array(rt_transform_array).reshape((4, 4), order='F')
     return ego_pom
 
-# ... (Your previous calculate_pom_deg and load_ego_pom_from_rt_transform functions)
 
-def create_nerfstudio_conversion_matrix():
-    """
-    Creates the 4x4 matrix to convert from a typical (X-Right, Y-Down, Z-Forward)
-    camera convention to the Nerfstudio/OpenGL (X-Right, Y-Up, Z-Back) convention.
-    This is a 180-degree rotation around the X-axis.
-    """
-    T_conversion = np.identity(4)
-    # Flip Y and Z axes
-    T_conversion[1, 1] = -1.0
-    T_conversion[2, 2] = -1.0
-    return T_conversion
+# def create_nerfstudio_conversion_matrix():
+#     """
+#     Creates the 4x4 matrix to convert from a typical (X-Right, Y-Down, Z-Forward)
+#     camera convention to the Nerfstudio/OpenGL (X-Right, Y-Up, Z-Back) convention.
+#     This is a 180-degree rotation around the X-axis.
+#     """
+#     T_conversion = np.identity(4)
+#     # Flip Y and Z axes
+#     T_conversion[1, 1] = -1.0
+#     T_conversion[2, 2] = -1.0
+#     return T_conversion
+
+# def create_nerfstudio_conversion_matrix():
+#     """
+#     Creates the 4x4 matrix to convert from the aiSim Robotics convention 
+#     (X-Forward, Y-Left, Z-Up) to the Nerfstudio/OpenGL convention 
+#     (X-Right, Y-Up, Z-Back).
+#     """
+#     # We construct the matrix columns based on where we want the source axes to go.
+#     # Source X (Forward) -> Target -Z (Back is +Z, so Forward looks down -Z)
+#     # Source Y (Left)    -> Target -X (Right is +X, so Left is -X)
+#     # Source Z (Up)      -> Target +Y (Up is +Y)
+    
+#     T_conversion = np.zeros((4, 4))
+    
+#     # Column 0: Source X (Forward) lands in Target Z (with -1 sign)
+#     T_conversion[2, 0] = -1.0 
+    
+#     # Column 1: Source Y (Left) lands in Target X (with -1 sign)
+#     T_conversion[0, 1] = -1.0 
+    
+#     # Column 2: Source Z (Up) lands in Target Y (with +1 sign)
+#     T_conversion[1, 2] = 1.0 
+    
+#     # Homogeneous component
+#     T_conversion[3, 3] = 1.0
+    
+#     return T_conversion
+
+# def create_nerfstudio_conversion_matrix(): # test 4
+#     """
+#     Revised Conversion Matrix.
+#     Previous Issue: Camera was looking "Outside" (Right/Radial) instead of Forward.
+#     Fix: Rotate 90 degrees to align Source Y (Left/Tangent) with Target Look.
+    
+#     Mapping:
+#     - Source Y (was Left)  -> Target -Z (New Look Direction)
+#     - Source X (was Fwd)   -> Target +X (New Right Direction)
+#     - Source Z (Up)        -> Target +Y (Up)
+#     """
+#     T_conversion = np.zeros((4, 4))
+    
+#     # 1. Map Source X to Nerfstudio Right (+X)
+#     # This assumes the "Old Forward" is actually pointing Right (Outside)
+#     T_conversion[0, 0] = 1.0 
+    
+#     # 2. Map Source Y to Nerfstudio Back (+Z)
+#     # Nerfstudio looks down -Z. So if we map Y to -Z (value -1), 
+#     # the Camera will look along +Y. 
+#     # Wait, we want to look along the tangent.
+#     # If the previous code looked "Outside" (North), and we want "Tangent" (West),
+#     # we need to rotate the mapping.
+    
+#     # Let's try mapping Source Y (Left) to Look (-Z).
+#     # If Source Y is West, Camera will look West.
+#     T_conversion[2, 1] = -1.0 
+    
+#     # 3. Map Source Z to Nerfstudio Up (+Y)
+#     T_conversion[1, 2] = 1.0 
+    
+#     # 4. Homogeneous
+#     T_conversion[3, 3] = 1.0
+    
+#     return T_conversion
+
+# def create_nerfstudio_conversion_matrix(): # test 5
+#     """
+#     Corrects the alignment from aiSim Sensor Space to Nerfstudio Camera Space.
+    
+#     Source (aiSim Sensor):
+#     - X: Forward
+#     - Y: Left
+#     - Z: Up
+    
+#     Target (Nerfstudio Camera):
+#     - Z: Back (so -Z is Look/Forward)
+#     - X: Right
+#     - Y: Up
+#     """
+#     T = np.zeros((4, 4))
+    
+#     # 1. Forward Mapping:
+#     # We want Sensor Forward (+X) to be Camera Look (-Z).
+#     # So Source X maps to Target -Z.
+#     T[2, 0] = -1.0 
+    
+#     # 2. Left Mapping:
+#     # We want Sensor Left (+Y) to be Camera Left (-X).
+#     # Since Target X is Right, Source Y maps to Target -X.
+#     T[0, 1] = -1.0
+    
+#     # 3. Up Mapping:
+#     # We want Sensor Up (+Z) to be Camera Up (+Y).
+#     T[1, 2] = 1.0
+    
+#     # 4. Homogeneous
+#     T[3, 3] = 1.0
+    
+#     return T
+
+def nerfstudio_conversion(T_matrix):
+    T_converted = np.zeros((4, 4))
+    T_rotation = T_matrix[:3, :3]
+    T_permutation = np.array([
+        [0, 0, -1],
+        [-1, 0, 0],
+        [0, 1, 0]
+        ])
+    
+    T_rotation_converted = T_rotation @ T_permutation
+    position_vec = T_matrix[:3, 3]
+    position_vec_converted = position_vec# @ T_permutation
+    T_converted[:3, :3] = T_rotation_converted
+    T_converted[:3, 3] = position_vec_converted
+    T_converted[3, 3] = 1.0
+    # print(T_converted)
+    return T_converted
 
 def calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file):
     """transform matrix like in the nerfstudio transforms.json
@@ -210,36 +309,35 @@ def calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file):
     # camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
     sensor_pos, sensor_rot = get_sensor_position_rotation(camera_calibration_file)
     # print(pos, rot)
+
+    # are these in degrees
     yaw, pitch, roll = sensor_rot['yaw'], sensor_rot['pitch'], sensor_rot['roll']
     
     # 
     rt_transform_arr = get_rt_transform(vehicle_sensor_file)
-
     T_sensor_pom = calculate_pom_deg(sensor_pos, yaw, pitch, roll)
     T_ego_pom = reshape_rt_transform(rt_transform_arr)
     # print(f"T_ego_pom = \n {T_ego_pom}")
     T_w2c = T_ego_pom @ T_sensor_pom
-    T_conversion = create_nerfstudio_conversion_matrix()
-    
-    # Final matrix: T_w2c @ T_conversion
-    T_c2w_ns = T_w2c @ T_conversion
-    
-    return T_c2w_ns  # T for the ns representation
+    T_converted = nerfstudio_conversion(T_w2c)
 
-    
+    return T_converted # T for the ns representation
+
+# TEST - for a single example
 # def main():
-    # TEST - for a single example
-    # camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json" # the calibration file
-    # vehicle_sensor_file = "C:/Users/Labor/Documents/MendeFolder/quick_poly_crop/2025-12-04_18-22-25/ego/vehicle_sensor/vehicle_sensor_00000.json" # single example file
-    # print(calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file))
+#     print(TEST_NUM)
+#     camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json" # the calibration file
+#     vehicle_sensor_file = "./data/2025-12-04_18-22-25/ego/vehicle_sensor/vehicle_sensor_00000.json" # single example file
+#     print(calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file))
 
+#The Main loop
 def main():
     # DEV - for a big folder
     output_dir = Path(OUTPUT_DIR)
     output_file_path = output_dir / f"transforms_{CAMERA_TYPE}_test{TEST_NUM}.json"
     print(f"[INFO] Output path is {str(output_file_path)}")
     
-    intrinsic_params = get_intrinsic_params(CAMERA_CALIBRATION_FILE)
+    intrinsic_params = get_intrinsic_params(CAMERA_CALIBRATION_FILE, CAMERA_TYPE)
 
     vehicle_sensor_files_path = Path("./data/2025-12-04_18-22-25/ego/vehicle_sensor") # for the whole car
     vehicle_sensor_files = list(vehicle_sensor_files_path.glob("vehicle_sensor*.json"))

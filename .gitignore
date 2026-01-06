@@ -1,5 +1,6 @@
 data/
 outputs/
+exports/
 __pycache__/
 *.ipynb_checkpoints
 aisim_ns_dataset
