@@ -3,12 +3,14 @@ import numpy as np
 import json
 import cv2
 import os
+from pathlib import Path
 
 # --- CONFIGURATION ---
-PLY_FILE = "lidar_world_aligned.ply"  # The uncolored point cloud
-JSON_FILE = "transforms.json"         # Nerfstudio transforms
-IMAGE_DIR = "."                       # Root dir where image paths in JSON are relative to
-OUTPUT_FILE = "lidar_colored.ply"
+DATASET_FOLDER = Path('aisim_ns_dataset_lidar')
+PLY_FILE = DATASET_FOLDER / "lidar_world_aligned.ply"  # The uncolored point cloud
+JSON_FILE = DATASET_FOLDER / "transforms.json"         # Nerfstudio transforms
+IMAGE_DIR = DATASET_FOLDER                # Root dir where image paths in JSON are relative to
+OUTPUT_FILE = DATASET_FOLDER / "lidar_colored.ply"
 
 # Optimization: Don't use every single frame (too slow). 
 # Using every 10th frame is usually enough to color the whole map.
