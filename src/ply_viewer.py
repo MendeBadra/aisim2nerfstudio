@@ -4,7 +4,7 @@ import os
 
 # usage: python view_ply.py your_file.ply
 DATASET_FOLDER = "aisim_ns_dataset_lidar"
-file_name = "lidar_optimized.ply" # Change this if not running from command line
+file_name = "lidar_world_aligned.ply" # Change this if not running from command line
 
 filename = os.path.join(DATASET_FOLDER, file_name)
 
