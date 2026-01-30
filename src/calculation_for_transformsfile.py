@@ -174,121 +174,10 @@ def reshape_rt_transform(rt_transform_array):
     ego_pom = np.array(rt_transform_array).reshape((4, 4), order='F')
     return ego_pom
 
-
-# def create_nerfstudio_conversion_matrix():
-#     """
-#     Creates the 4x4 matrix to convert from a typical (X-Right, Y-Down, Z-Forward)
-#     camera convention to the Nerfstudio/OpenGL (X-Right, Y-Up, Z-Back) convention.
-#     This is a 180-degree rotation around the X-axis.
-#     """
-#     T_conversion = np.identity(4)
-#     # Flip Y and Z axes
-#     T_conversion[1, 1] = -1.0
-#     T_conversion[2, 2] = -1.0
-#     return T_conversion
-
-# def create_nerfstudio_conversion_matrix():
-#     """
-#     Creates the 4x4 matrix to convert from the aiSim Robotics convention 
-#     (X-Forward, Y-Left, Z-Up) to the Nerfstudio/OpenGL convention 
-#     (X-Right, Y-Up, Z-Back).
-#     """
-#     # We construct the matrix columns based on where we want the source axes to go.
-#     # Source X (Forward) -> Target -Z (Back is +Z, so Forward looks down -Z)
-#     # Source Y (Left)    -> Target -X (Right is +X, so Left is -X)
-#     # Source Z (Up)      -> Target +Y (Up is +Y)
-    
-#     T_conversion = np.zeros((4, 4))
-    
-#     # Column 0: Source X (Forward) lands in Target Z (with -1 sign)
-#     T_conversion[2, 0] = -1.0 
-    
-#     # Column 1: Source Y (Left) lands in Target X (with -1 sign)
-#     T_conversion[0, 1] = -1.0 
-    
-#     # Column 2: Source Z (Up) lands in Target Y (with +1 sign)
-#     T_conversion[1, 2] = 1.0 
-    
-#     # Homogeneous component
-#     T_conversion[3, 3] = 1.0
-    
-#     return T_conversion
-
-# def create_nerfstudio_conversion_matrix(): # test 4
-#     """
-#     Revised Conversion Matrix.
-#     Previous Issue: Camera was looking "Outside" (Right/Radial) instead of Forward.
-#     Fix: Rotate 90 degrees to align Source Y (Left/Tangent) with Target Look.
-    
-#     Mapping:
-#     - Source Y (was Left)  -> Target -Z (New Look Direction)
-#     - Source X (was Fwd)   -> Target +X (New Right Direction)
-#     - Source Z (Up)        -> Target +Y (Up)
-#     """
-#     T_conversion = np.zeros((4, 4))
-    
-#     # 1. Map Source X to Nerfstudio Right (+X)
-#     # This assumes the "Old Forward" is actually pointing Right (Outside)
-#     T_conversion[0, 0] = 1.0 
-    
-#     # 2. Map Source Y to Nerfstudio Back (+Z)
-#     # Nerfstudio looks down -Z. So if we map Y to -Z (value -1), 
-#     # the Camera will look along +Y. 
-#     # Wait, we want to look along the tangent.
-#     # If the previous code looked "Outside" (North), and we want "Tangent" (West),
-#     # we need to rotate the mapping.
-    
-#     # Let's try mapping Source Y (Left) to Look (-Z).
-#     # If Source Y is West, Camera will look West.
-#     T_conversion[2, 1] = -1.0 
-    
-#     # 3. Map Source Z to Nerfstudio Up (+Y)
-#     T_conversion[1, 2] = 1.0 
-    
-#     # 4. Homogeneous
-#     T_conversion[3, 3] = 1.0
-    
-#     return T_conversion
-
-# def create_nerfstudio_conversion_matrix(): # test 5
-#     """
-#     Corrects the alignment from aiSim Sensor Space to Nerfstudio Camera Space.
-    
-#     Source (aiSim Sensor):
-#     - X: Forward
-#     - Y: Left
-#     - Z: Up
-    
-#     Target (Nerfstudio Camera):
-#     - Z: Back (so -Z is Look/Forward)
-#     - X: Right
-#     - Y: Up
-#     """
-#     T = np.zeros((4, 4))
-    
-#     # 1. Forward Mapping:
-#     # We want Sensor Forward (+X) to be Camera Look (-Z).
-#     # So Source X maps to Target -Z.
-#     T[2, 0] = -1.0 
-    
-#     # 2. Left Mapping:
-#     # We want Sensor Left (+Y) to be Camera Left (-X).
-#     # Since Target X is Right, Source Y maps to Target -X.
-#     T[0, 1] = -1.0
-    
-#     # 3. Up Mapping:
-#     # We want Sensor Up (+Z) to be Camera Up (+Y).
-#     T[1, 2] = 1.0
-    
-#     # 4. Homogeneous
-#     T[3, 3] = 1.0
-    
-#     return T
-
 def nerfstudio_conversion(T_matrix):
     T_converted = np.zeros((4, 4))
     T_rotation = T_matrix[:3, :3]
-    T_permutation = np.array([
+    T_permutation = np.array([ # this is for the conversion between coordinate systems
         [0, 0, -1],
         [-1, 0, 0],
         [0, 1, 0]
@@ -318,10 +207,11 @@ def calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file):
     T_sensor_pom = calculate_pom_deg(sensor_pos, yaw, pitch, roll)
     T_ego_pom = reshape_rt_transform(rt_transform_arr)
     # print(f"T_ego_pom = \n {T_ego_pom}")
-    T_w2c = T_ego_pom @ T_sensor_pom
-    T_converted = nerfstudio_conversion(T_w2c)
+    # Doc: When a local coordinate is multiplied by the local POM, the result is a coordinate in the parent space
+    T_world = T_ego_pom @ T_sensor_pom # world, ego, sensor
+    T_world_converted = nerfstudio_conversion(T_world)
 
-    return T_converted # T for the ns representation
+    return T_world_converted # T for the ns representation
 
 # TEST - for a single example
 # def main():
