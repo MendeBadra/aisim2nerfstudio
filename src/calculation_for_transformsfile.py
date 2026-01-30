@@ -208,10 +208,10 @@ def calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file):
     T_ego_pom = reshape_rt_transform(rt_transform_arr)
     # print(f"T_ego_pom = \n {T_ego_pom}")
     # Doc: When a local coordinate is multiplied by the local POM, the result is a coordinate in the parent space
-    T_world = T_ego_pom @ T_sensor_pom # world, ego, sensor
-    T_world_converted = nerfstudio_conversion(T_world)
+    T_sensor_to_world = T_ego_pom @ T_sensor_pom # world, ego, sensor
+    T_sensor_to_world_converted = nerfstudio_conversion(T_sensor_to_world)
 
-    return T_world_converted # T for the ns representation
+    return T_sensor_to_world_converted # T for the ns representation
 
 # TEST - for a single example
 # def main():
