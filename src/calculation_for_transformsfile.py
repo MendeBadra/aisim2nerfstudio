@@ -78,7 +78,7 @@ def get_intrinsic_params(camera_calibration_file, camera_type = CAMERA_TYPE):
     
     return output
 
-def get_sensor_position_rotation(camera_calibration_file):
+def get_sensor_position_rotation(camera_calibration_file, camera_type = CAMERA_TYPE):
      with open(camera_calibration_file, 'r') as f:
         input_data = json.load(f)
     # 1. Navigate to the core camera configuration block
