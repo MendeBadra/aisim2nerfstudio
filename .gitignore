@@ -1,10 +1,11 @@
 data/
-notebooks/
+
 outputs/
 exports/
 __pycache__/
 *.ipynb_checkpoints
 aisim_ns_dataset
 aisim_ns_dataset_lidar
+
 
 *.tga
