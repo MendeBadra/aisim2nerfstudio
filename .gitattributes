@@ -1,1 +1,2 @@
+frame_with_depth/lidar_world_aligned.ply filter=lfs diff=lfs merge=lfs -text
 *.ply filter=lfs diff=lfs merge=lfs -text
