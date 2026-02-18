@@ -63,17 +63,13 @@ aiSim → Nerfstudio axes:
 * **Nerfstudio:** +X Right, +Y Up, -Z Forward
 
 Applied transformation matrix:
-$$
-[
-T_\text{trans} =
-\begin{bmatrix}
-0 & 0 & -1 & 0 \
--1 & 0 & 0 & 0 \
-0 & 1 & 0 & 0 \
-0 & 0 & 0 & 1
-\end{bmatrix}
+
+T_trans = [
+  0   0  -1   0
+ -1   0   0   0
+  0   1   0   0
+  0   0   0   1
 ]
-$$
 ---
 
 ## Status
