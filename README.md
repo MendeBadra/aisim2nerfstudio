@@ -52,11 +52,7 @@ This is a living and active repository for taking in aiSim sensor JSON data and 
 * **Output:** Trained NeRF/SplatFacto model in Nerfstudio `outputs/` folder, ready for visualization
 
 [pic]()
----
 
-If you want, I can **rewrite your full README with this Windows setup integrated** and keep it concise & GitHub-friendly, so it’s ready to publish.
-
-Do you want me to do that next?
 
 ## Coordinate Transformation
 
