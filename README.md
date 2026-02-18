@@ -30,11 +30,14 @@ This is a living and active repository for taking in aiSim sensor JSON data and 
 
    ```
    transforms.json
-   RGB frames
-   LiDAR frames
+   ```
+4. **Run the script**
+   ```
+   python src/calculation_for_transformsfile.py
    ```
 
-4. **Run Nerfstudio training**
+
+SIDE_NOTE: **Run Nerfstudio training**
    Example command for training with your MCMC strategy:
 
    ```bash
