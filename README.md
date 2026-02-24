@@ -12,7 +12,19 @@ This is a living and active repository for taking in aiSim sensor JSON data and 
    conda env create -f environment.yml
    ```
 
-2. **Activate environment and setup paths**
+   Note that the included `environment.yml` is a environment called `mendenv` which only have few essential packages installed.
+
+   
+
+2. **Run the script**
+   ```
+   python src/calculation_for_transformsfile.py
+   ``` 
+
+
+## `SIDE_NOTE`: **Run Nerfstudio training on Kenny PC**
+
+1. **Activate environment and setup paths**
 
    ```bat
    conda activate nerfstudio1
@@ -25,19 +37,14 @@ This is a living and active repository for taking in aiSim sensor JSON data and 
    set CUDA_HOME=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8
    ```
 
-3. **Dataset folder**
+2. **Dataset folder**
    Ensure the `frame_with_depth` folder (from `aisim_ns_dataset_lidar`) is placed in the project root. It should contain:
 
    ```
    transforms.json
    ```
-4. **Run the script**
-   ```
-   python src/calculation_for_transformsfile.py
-   ```
-
-
-SIDE_NOTE: **Run Nerfstudio training**
+3. **Train a `splatfacto` model**
+   
    Example command for training with your MCMC strategy:
 
    ```bash
