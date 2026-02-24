@@ -63,8 +63,6 @@ If you have the nerfstudio installed and ready to run, please use the following 
 * **Input:** `frame_with_depth/transforms.json` + RGB/LiDAR frames
 * **Output:** Trained NeRF/SplatFacto model in Nerfstudio `outputs/` folder, ready for visualization
 
-[pic]()
-
 
 ## Coordinate Transformation
 
