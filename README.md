@@ -23,7 +23,7 @@ This is a living and active repository for taking in aiSim sensor JSON data and 
 
 
 ## `SIDE_NOTE`: **Run Nerfstudio training on Kenny PC**
-
+If you have the nerfstudio installed and ready to run, please use the following instruction (Especially on kenny pc).
 1. **Activate environment and setup paths**
 
    ```bat
