@@ -19,7 +19,10 @@ CAMERA_TYPE = "pinhole" # forward
 # CAMERA_TYPE = "pinhole_duplicate2"
 GPS_VEHICLE_SENSOR_DATASET = "2025-12-04_18-22-25"
 
-CAMERA_CALIBRATION_FILE = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
+# NOTE: In the computer that had the aisim installation, the calibration file was as follows. But I copied it to calibrations folder.
+# CAMERA_CALIBRATION_FILE = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
+
+CAMERA_CALIBRATION_FILE = "calibrations/mend_front_back_2side_pinhole.json"
 # OUTPUT_DIR = "outputs/test0" # 2025.12.17 The fix needed
 OUTPUT_DIR = "outputs"
 TEST_NUM = 12

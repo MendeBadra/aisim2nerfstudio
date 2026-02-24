@@ -1,0 +1,467 @@
+{
+    "sensor_brackets": {},
+    "sensors": {
+        "gps_sensor": {
+            "type": "gps",
+            "update_intervals": [
+                40000
+            ]
+        },
+        "lidar_sensor": {
+            "lidar_config": {
+                "distance_accuracy_meter": 0,
+                "distance_max_meter": 50,
+                "distance_min_meter": 0,
+                "horizontal_resolution_deg": 0.2,
+                "laser_count": 64,
+                "max_stored_cycles": 2,
+                "rpm": 1200,
+                "vertical_fov_max_deg": 45,
+                "vertical_fov_min_deg": -35,
+                "visualization": {
+                    "color": [
+                        255,
+                        0,
+                        0
+                    ],
+                    "enabled": false,
+                    "point_size": 40
+                }
+            },
+            "mounting": {
+                "position": [
+                    1,
+                    0,
+                    2
+                ],
+                "rotation": {
+                    "pitch": 0,
+                    "roll": 0,
+                    "yaw": 0
+                }
+            },
+            "type": "lidar",
+            "update_intervals": [
+                40000
+            ]
+        },
+        "pinhole": {
+            "camera_config": {
+                "chromatic_aberration_parameters": {
+                    "blue_channel_translation": [
+                        0,
+                        0
+                    ],
+                    "green_channel_scale": 0,
+                    "green_channel_translation": [
+                        0,
+                        0
+                    ],
+                    "red_channel_translation": [
+                        0,
+                        0
+                    ]
+                },
+                "chromatic_aberration_type": "None",
+                "color_filter": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "depth_type": "None",
+                "distortion_parameters": {
+                    "distortion_coefficients": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "focal_length": [
+                        751.3418667502033,
+                        750.6179165472433
+                    ],
+                    "principal_point": [
+                        640,
+                        360
+                    ]
+                },
+                "height": 720,
+                "image_type": "ColorRGBA",
+                "model": "OpenCVPinhole",
+                "position": [
+                    1.8,
+                    0,
+                    1.5
+                ],
+                "render_properties": {
+                    "environment_mapping_type": "None",
+                    "far_plane": 512,
+                    "gpu_id": 0,
+                    "hil_offset": 0,
+                    "lens_flare_intensity": 0,
+                    "max_bloom_depth": 4,
+                    "near_plane": 0.01,
+                    "post_process_render_parameters": {
+                        "bloom_intensity": 0.04,
+                        "color_temperature": 6600,
+                        "color_temperature_weight": 0,
+                        "contrast": 1,
+                        "contrast_center": 0.5,
+                        "saturation": 0.8999999761581421,
+                        "sharpen_limit": 0.23000000417232513,
+                        "sharpen_strength": 0.20000000298023224,
+                        "tonemapper": "FilmicACES",
+                        "use_bloom_firefly_filter": true,
+                        "white_multiplier": 1
+                    },
+                    "smaa_enabled": false,
+                    "ssao_samples": 64,
+                    "supersampling_enabled": false
+                },
+                "rotation": {
+                    "pitch": 9,
+                    "roll": 0,
+                    "yaw": 0
+                },
+                "segmentation_enabled": false,
+                "sensor_blockage_parameters": {
+                    "bias": 0,
+                    "generate_gt": true,
+                    "seed": 326,
+                    "type": "Condensation"
+                },
+                "width": 1280
+            },
+            "offset": 0,
+            "type": "camera",
+            "update_intervals": [
+                40000
+            ]
+        },
+        "pinhole_duplicate0": {
+            "camera_config": {
+                "chromatic_aberration_parameters": {
+                    "blue_channel_translation": [
+                        0,
+                        0
+                    ],
+                    "green_channel_scale": 0,
+                    "green_channel_translation": [
+                        0,
+                        0
+                    ],
+                    "red_channel_translation": [
+                        0,
+                        0
+                    ]
+                },
+                "chromatic_aberration_type": "None",
+                "color_filter": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "depth_type": "None",
+                "distortion_parameters": {
+                    "distortion_coefficients": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "focal_length": [
+                        751.3418667502033,
+                        750.6179165472433
+                    ],
+                    "principal_point": [
+                        640,
+                        360
+                    ]
+                },
+                "height": 720,
+                "image_type": "ColorRGBA",
+                "model": "OpenCVPinhole",
+                "position": [
+                    0.17903470993041992,
+                    0,
+                    1.4843382835388184
+                ],
+                "render_properties": {
+                    "environment_mapping_type": "None",
+                    "far_plane": 512,
+                    "gpu_id": 0,
+                    "hil_offset": 0,
+                    "lens_flare_intensity": 0,
+                    "max_bloom_depth": 4,
+                    "near_plane": 0.01,
+                    "post_process_render_parameters": {
+                        "bloom_intensity": 0.04,
+                        "color_temperature": 6600,
+                        "color_temperature_weight": 0,
+                        "contrast": 1,
+                        "contrast_center": 0.5,
+                        "saturation": 0.8999999761581421,
+                        "sharpen_limit": 0.23000000417232513,
+                        "sharpen_strength": 0.20000000298023224,
+                        "tonemapper": "FilmicACES",
+                        "use_bloom_firefly_filter": true,
+                        "white_multiplier": 1
+                    },
+                    "smaa_enabled": false,
+                    "ssao_samples": 64,
+                    "supersampling_enabled": false
+                },
+                "rotation": {
+                    "pitch": 7.105,
+                    "roll": 1.017,
+                    "yaw": 177.247
+                },
+                "segmentation_enabled": false,
+                "sensor_blockage_parameters": {
+                    "bias": 0,
+                    "generate_gt": true,
+                    "seed": 326,
+                    "type": "Condensation"
+                },
+                "width": 1280
+            },
+            "offset": 0,
+            "type": "camera",
+            "update_intervals": [
+                40000
+            ]
+        },
+        "pinhole_duplicate1": {
+            "camera_config": {
+                "chromatic_aberration_parameters": {
+                    "blue_channel_translation": [
+                        0,
+                        0
+                    ],
+                    "green_channel_scale": 0,
+                    "green_channel_translation": [
+                        0,
+                        0
+                    ],
+                    "red_channel_translation": [
+                        0,
+                        0
+                    ]
+                },
+                "chromatic_aberration_type": "None",
+                "color_filter": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "depth_type": "None",
+                "distortion_parameters": {
+                    "distortion_coefficients": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "focal_length": [
+                        751.3418667502033,
+                        750.6179165472433
+                    ],
+                    "principal_point": [
+                        640,
+                        360
+                    ]
+                },
+                "height": 720,
+                "image_type": "ColorRGBA",
+                "model": "OpenCVPinhole",
+                "position": [
+                    1,
+                    0.6,
+                    1.5
+                ],
+                "render_properties": {
+                    "environment_mapping_type": "None",
+                    "far_plane": 512,
+                    "gpu_id": 0,
+                    "hil_offset": 0,
+                    "lens_flare_intensity": 0,
+                    "max_bloom_depth": 4,
+                    "near_plane": 0.01,
+                    "post_process_render_parameters": {
+                        "bloom_intensity": 0.04,
+                        "color_temperature": 6600,
+                        "color_temperature_weight": 0,
+                        "contrast": 1,
+                        "contrast_center": 0.5,
+                        "saturation": 0.8999999761581421,
+                        "sharpen_limit": 0.23000000417232513,
+                        "sharpen_strength": 0.20000000298023224,
+                        "tonemapper": "FilmicACES",
+                        "use_bloom_firefly_filter": true,
+                        "white_multiplier": 1
+                    },
+                    "smaa_enabled": false,
+                    "ssao_samples": 64,
+                    "supersampling_enabled": false
+                },
+                "rotation": {
+                    "pitch": 10,
+                    "roll": 0,
+                    "yaw": 90
+                },
+                "segmentation_enabled": false,
+                "sensor_blockage_parameters": {
+                    "bias": 0,
+                    "generate_gt": true,
+                    "seed": 326,
+                    "type": "Condensation"
+                },
+                "width": 1280
+            },
+            "offset": 0,
+            "type": "camera",
+            "update_intervals": [
+                40000
+            ]
+        },
+        "pinhole_duplicate2": {
+            "camera_config": {
+                "chromatic_aberration_parameters": {
+                    "blue_channel_translation": [
+                        0,
+                        0
+                    ],
+                    "green_channel_scale": 0,
+                    "green_channel_translation": [
+                        0,
+                        0
+                    ],
+                    "red_channel_translation": [
+                        0,
+                        0
+                    ]
+                },
+                "chromatic_aberration_type": "None",
+                "color_filter": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "depth_type": "None",
+                "distortion_parameters": {
+                    "distortion_coefficients": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "focal_length": [
+                        751.3418667502033,
+                        750.6179165472433
+                    ],
+                    "principal_point": [
+                        640,
+                        360
+                    ]
+                },
+                "height": 720,
+                "image_type": "ColorRGBA",
+                "model": "OpenCVPinhole",
+                "position": [
+                    1,
+                    -0.6,
+                    1.5
+                ],
+                "render_properties": {
+                    "environment_mapping_type": "None",
+                    "far_plane": 512,
+                    "gpu_id": 0,
+                    "hil_offset": 0,
+                    "lens_flare_intensity": 0,
+                    "max_bloom_depth": 4,
+                    "near_plane": 0.01,
+                    "post_process_render_parameters": {
+                        "bloom_intensity": 0.04,
+                        "color_temperature": 6600,
+                        "color_temperature_weight": 0,
+                        "contrast": 1,
+                        "contrast_center": 0.5,
+                        "saturation": 0.8999999761581421,
+                        "sharpen_limit": 0.23000000417232513,
+                        "sharpen_strength": 0.20000000298023224,
+                        "tonemapper": "FilmicACES",
+                        "use_bloom_firefly_filter": true,
+                        "white_multiplier": 1
+                    },
+                    "smaa_enabled": false,
+                    "ssao_samples": 64,
+                    "supersampling_enabled": false
+                },
+                "rotation": {
+                    "pitch": 10,
+                    "roll": 0,
+                    "yaw": -90
+                },
+                "segmentation_enabled": false,
+                "sensor_blockage_parameters": {
+                    "bias": 0,
+                    "generate_gt": true,
+                    "seed": 326,
+                    "type": "Condensation"
+                },
+                "width": 1280
+            },
+            "offset": 0,
+            "type": "camera",
+            "update_intervals": [
+                40000
+            ]
+        },
+        "vehicle_sensor": {
+            "type": "vehicle",
+            "update_intervals": [
+                40000
+            ]
+        }
+    }
+}
