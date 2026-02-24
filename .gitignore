@@ -12,6 +12,7 @@ __pycache__/
 aisim_ns_dataset/*/
 # contains the relevant data
 aisim_ns_dataset_lidar/*/
+aisim_ns_dataset_lidar/*.zip
 
 renders/
 

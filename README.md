@@ -21,8 +21,6 @@ This is a living and active repository for taking in aiSim sensor JSON data and 
    python src/calculation_for_transformsfile.py
    ``` 
 
-   Note that 
-
 
 ## `SIDE_NOTE`: **Run Nerfstudio training on Kenny PC**
 If you have the nerfstudio installed and ready to run, please use the following instruction (Especially on kenny pc).
@@ -96,7 +94,7 @@ T_trans = [
 ```
 aisim2nerfstudio/
 ├─ frame_with_depth/     # RGB + LiDAR + transforms.json
-├─ scripts/             # Conversion scripts
+├─ src/             # Conversion scripts
 └─ README.md
 ```
 
@@ -108,3 +106,6 @@ aisim2nerfstudio/
 
 TODO:
 [] lidar_pointcloud_to_initialization_colors.py
+
+NOTE:
+- LiDAR point clouds of the original sensor data can be found in `aisim_ns_dataset_lidar` folder. The files are named `ego_lidar_sensor_las.zip` and can be downloaded from [here](https://drive.google.com/file/d/1_w7j8nukf5RsJ7_D2PTrUMYs-NiL-0ff/view?usp=drive_link) to be extracted (My Drive > BME2025 > Project lab). 
