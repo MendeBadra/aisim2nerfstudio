@@ -1,2 +1,6 @@
 frame_with_depth/lidar_world_aligned.ply filter=lfs diff=lfs merge=lfs -text
 *.ply filter=lfs diff=lfs merge=lfs -text
+aisim_ns_dataset/lidar_colored.ply filter=lfs diff=lfs merge=lfs -text
+aisim_ns_dataset/lidar_merged.ply filter=lfs diff=lfs merge=lfs -text
+aisim_ns_dataset/lidar_optimized.ply filter=lfs diff=lfs merge=lfs -text
+aisim_ns_dataset/lidar_world_aligned.ply filter=lfs diff=lfs merge=lfs -text

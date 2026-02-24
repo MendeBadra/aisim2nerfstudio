@@ -21,6 +21,8 @@ This is a living and active repository for taking in aiSim sensor JSON data and 
    python src/calculation_for_transformsfile.py
    ``` 
 
+   Note that 
+
 
 ## `SIDE_NOTE`: **Run Nerfstudio training on Kenny PC**
 If you have the nerfstudio installed and ready to run, please use the following instruction (Especially on kenny pc).

@@ -1,11 +1,19 @@
+# data folder contained each capture of the aisim simulation straight with only images and sensor data
 data/
 
+# outputs folder name seems to be a convention in the nerfstudio as well, where the "outputs" of the trained splatfacto or nerfacto models live
 outputs/
+
+# These are usually renders of each captures of a particular scene of model (after training)
 exports/
 __pycache__/
 *.ipynb_checkpoints
-aisim_ns_dataset
-aisim_ns_dataset_lidar
+# contains the relevant data
+aisim_ns_dataset/*/
+# contains the relevant data
+aisim_ns_dataset_lidar/*/
 
+renders/
 
+# repo wide omission of .tga files which are straigt output of aisim simulation images.
 *.tga
