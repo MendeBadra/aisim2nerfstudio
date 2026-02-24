@@ -105,3 +105,6 @@ aisim2nerfstudio/
 ## Next Steps
 
 * LiDAR integration
+
+TODO:
+[] lidar_pointcloud_to_initialization_colors.py
