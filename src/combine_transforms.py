@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-INPUT_DIR = "outputs"
+INPUT_DIR = "transforms_outputs"
 OUTPUT_DIR = "outputs"
 TEST_NUM = 12
 
