@@ -14,7 +14,12 @@ aisim_ns_dataset/*/
 aisim_ns_dataset_lidar/*/
 aisim_ns_dataset_lidar/*.zip
 
+notebooks/*.json
+
 renders/
+
+# The picture of tree that I took the images of and tried nerfstudio.
+tree_dataset/ 
 
 # repo wide omission of .tga files which are straigt output of aisim simulation images.
 *.tga

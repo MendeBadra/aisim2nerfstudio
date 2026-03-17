@@ -25,7 +25,7 @@ GPS_VEHICLE_SENSOR_DATASET = "2025-12-04_18-22-25"
 CAMERA_CALIBRATION_FILE = "calibrations/mend_front_back_2side_pinhole.json"
 # OUTPUT_DIR = "outputs/test0" # 2025.12.17 The fix needed
 OUTPUT_DIR = "outputs"
-TEST_NUM = 12
+TEST_NUM = 13
 # CAMERA_TYPE = "pinhole_duplicate0"
 
 def get_intrinsic_params(camera_calibration_file, camera_type = CAMERA_TYPE):

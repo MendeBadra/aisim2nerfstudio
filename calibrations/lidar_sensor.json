@@ -1,0 +1,32 @@
+{
+    "sensors": {
+	"lidar_sensor": {
+	    "type": "lidar",
+	    "update_intervals": [ 40000 ],
+	    "mounting": {
+		"position": [ 1.0, 0.0, 3.0 ],
+		"rotation": {
+		    "pitch": 0.0,
+		    "roll": 0.0,
+		    "yaw": 0.0
+		}
+	    },
+	    "lidar_config": {
+		"max_stored_cycles": 2,
+		"distance_min_meter": 0.0,
+		"distance_max_meter": 50.0,
+		"distance_accuracy_meter": 0.0,
+		"horizontal_resolution_deg": 0.2,
+		"laser_count": 64,
+		"vertical_fov_min_deg": -35.0,
+		"vertical_fov_max_deg": 45.0,
+		"rpm": 1200,
+		"visualization": {
+		    "enabled": false,
+		    "color": [ 255, 0, 0 ],
+		    "point_size": 40.0
+		}
+	    }
+	}
+    }
+}
