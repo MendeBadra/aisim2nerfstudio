@@ -2,7 +2,6 @@
 This script writes the transforms.json
 """
 
-
 import json
 from pathlib import Path
 import numpy as np
@@ -22,9 +21,15 @@ GPS_VEHICLE_SENSOR_DATASET = "2025-12-04_18-22-25"
 # NOTE: In the computer that had the aisim installation, the calibration file was as follows. But I copied it to calibrations folder.
 # CAMERA_CALIBRATION_FILE = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
 
+# rt_transform which is useful for (body) -> (world)
+VEHICLE_SENSOR_FOLDER = "./data/2025-12-04_18-22-25/ego/vehicle_sensor"
+# intrinsic params like pos and rot useful for (sensor) -> (body)
 CAMERA_CALIBRATION_FILE = "calibrations/mend_front_back_2side_pinhole.json"
 # OUTPUT_DIR = "outputs/test0" # 2025.12.17 The fix needed
 OUTPUT_DIR = "outputs"
+
+FORMAT = "nerfstudio" # or "aisim" itself
+OUTPUT = "json" # or "matrix" 
 TEST_NUM = 13
 # CAMERA_TYPE = "pinhole_duplicate0"
 
@@ -105,7 +110,8 @@ def get_rt_transform(file_path):
 def euler_zyx_to_matrix(yaw_rad, pitch_rad, roll_rad):
     """
     Converts Euler ZYX (Yaw, Pitch, Roll) angles to a 4x4 rotation matrix.
-    Note: See the aiSim documentation Coordinate transforms page. This is Python version of the Cpp code in the documentation
+    Note: See the aiSim documentation Coordinate transforms page. This is Python version of the Cpp code in the documentation!
+    Pg. 111
     """
     sin_z, cos_z = math.sin(yaw_rad), math.cos(yaw_rad)
     sin_y, cos_y = math.sin(pitch_rad), math.cos(pitch_rad)
@@ -178,6 +184,14 @@ def reshape_rt_transform(rt_transform_array):
     return ego_pom
 
 def nerfstudio_conversion(T_matrix):
+    # CHECK the nerfstudio convention here: https://docs.nerf.studio/quickstart/data_conventions.html
+    # +X is right, +Y is up, and +Z is pointing back and away from the camera.
+    # whereas in aisim it's +X is forward, +Y is left, +Z is up.
+    # To show that the permutation matrix is correct, consider the following chart:
+    # AISIM axis | Meaning | Nerfstudio equivalent
+    #   +X       | forward |     -Z (because +Z is backwards)
+    #   +Y       | left    |     -X 
+    #   +Z       |  up     |     +Y       and thus the permutation matrix transforms AISIM col to nerfstudio column.
     T_converted = np.zeros((4, 4))
     T_rotation = T_matrix[:3, :3]
     T_permutation = np.array([ # this is for the conversion between coordinate systems
@@ -195,7 +209,7 @@ def nerfstudio_conversion(T_matrix):
     # print(T_converted)
     return T_converted
 
-def calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file):
+def calculate_transform_matrix(camera_calibration_file, vehicle_sensor_file):
     """transform matrix like in the nerfstudio transforms.json
     NOTE: This is the main function that uses all of the functions defined."""
     # camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
@@ -212,9 +226,10 @@ def calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file):
     # print(f"T_ego_pom = \n {T_ego_pom}")
     # Doc: When a local coordinate is multiplied by the local POM, the result is a coordinate in the parent space
     T_sensor_to_world = T_ego_pom @ T_sensor_pom # world, ego, sensor
-    T_sensor_to_world_converted = nerfstudio_conversion(T_sensor_to_world)
+    if FORMAT == "nerfstudio":
+        T_sensor_to_world = nerfstudio_conversion(T_sensor_to_world)
 
-    return T_sensor_to_world_converted # T for the ns representation
+    return T_sensor_to_world # T for the ns representation
 
 # TEST - for a single example
 # def main():
@@ -223,7 +238,7 @@ def calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file):
 #     vehicle_sensor_file = "./data/2025-12-04_18-22-25/ego/vehicle_sensor/vehicle_sensor_00000.json" # single example file
 #     print(calculate_ns_transform_matrix(camera_calibration_file, vehicle_sensor_file))
 
-#The Main loop
+
 def main():
     # DEV - for a big folder
     output_dir = Path(OUTPUT_DIR)
@@ -232,7 +247,7 @@ def main():
     
     intrinsic_params = get_intrinsic_params(CAMERA_CALIBRATION_FILE, CAMERA_TYPE)
 
-    vehicle_sensor_files_path = Path("./data/2025-12-04_18-22-25/ego/vehicle_sensor") # for the whole car
+    vehicle_sensor_files_path = Path(VEHICLE_SENSOR_FOLDER) # for the whole car
     vehicle_sensor_files = list(vehicle_sensor_files_path.glob("vehicle_sensor*.json"))
     # vehicle_sensor_files = vehicle_sensor_files[:1]
     print(f"[INFO] We've got {len(vehicle_sensor_files)} files found for vehicle_sensor*.json")
@@ -245,8 +260,8 @@ def main():
             id_str = stem.replace(prefix, "")
         else:
             id_str = "N/A"
-
-        T_matrix = calculate_ns_transform_matrix(CAMERA_CALIBRATION_FILE, vehicle_sensor_file)
+        # T_matrix should be the sensor -> body -> world coordinate transformation in one matrix in nerfstudio format.
+        T_matrix = calculate_transform_matrix(CAMERA_CALIBRATION_FILE, vehicle_sensor_file)
         frame = {}
         frame['file_path'] = f"images/{CAMERA_TYPE}_{id_str}.jpg" # supposing that we've converted all .tga images to .jpg
         frame['mask_path'] = f"masks/mask_{CAMERA_TYPE}_{id_str}.jpg" # mask path
@@ -276,7 +291,7 @@ def main():
             -0.0
         ]
     ]
-    
+    # write the transforms.json file for the nerfstudio
     with open(output_file_path, 'w') as f:
         json.dump(transforms, f, indent=4)
     print("Done!")
