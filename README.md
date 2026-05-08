@@ -1,5 +1,7 @@
 # aisim2nerfstudio
 
+**Update:** Presentation about this project is available [here](https://docs.google.com/presentation/d/17_WL6TLeuwyaKR0MYXG1tqEJ3wvr8QZncGu0y5wK8lk/edit?usp=sharing).
+
 Convert **aiSim autonomous driving data** into **Nerfstudio** format for NeRF-based 3D reconstruction. The example output of camera and LiDAR poses in `frame_with_depth/transforms.json`.
 This is a living and active repository for taking in aiSim sensor JSON data and outputs a `transforms.json` file that's compatible for `nerfstudio` program. 
 
