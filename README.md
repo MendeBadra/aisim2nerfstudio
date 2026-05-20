@@ -1,6 +1,7 @@
 # aisim2nerfstudio
 
 **Update:** Presentation about this project is available [here](https://docs.google.com/presentation/d/17_WL6TLeuwyaKR0MYXG1tqEJ3wvr8QZncGu0y5wK8lk/edit?usp=sharing).
+
 **Update2:** Video of the gaussian splat made is attached.
 
 
