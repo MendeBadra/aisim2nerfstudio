@@ -2,7 +2,9 @@
 
 **Update:** Presentation about this project is available [here](https://docs.google.com/presentation/d/17_WL6TLeuwyaKR0MYXG1tqEJ3wvr8QZncGu0y5wK8lk/edit?usp=sharing).
 **Update2:** Video of the gaussian splat made is attached.
-![Tree outside BME gaussian splat](splatfactobig_tree.mp4)
+
+<video src="splatfactobig_tree.mp4" width="320" height="240" controls></video>
+
 
 Convert **aiSim autonomous driving data** into **Nerfstudio** format for NeRF-based 3D reconstruction. The example output of camera and LiDAR poses in `frame_with_depth/transforms.json`.
 This is a living and active repository for taking in aiSim sensor JSON data and outputs a `transforms.json` file that's compatible for `nerfstudio` program. 
