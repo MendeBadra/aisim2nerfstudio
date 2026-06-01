@@ -1,6 +1,14 @@
 # aisim2nerfstudio
 
-Convert **aiSim autonomous driving data** into **Nerfstudio** format for NeRF-based 3D reconstruction. The example output of camera and LiDAR poses in `frame_with_depth/transforms.json`.
+**Update:** Presentation about this project is available [here](https://docs.google.com/presentation/d/17_WL6TLeuwyaKR0MYXG1tqEJ3wvr8QZncGu0y5wK8lk/edit?usp=sharing).
+
+
+<img width="1375" height="606" alt="image" src="https://github.com/user-attachments/assets/6a8c5ea4-5cbc-40e9-8f38-a22ef0e7fcaa" />
+
+
+Convert **aiSim autonomous driving data** into **Nerfstudio** format for NeRF-based 3D reconstruction. This project aimed to convert aiSim automotive simulation software output sensor parameters such as vehicle position, orientation, camera position and orientation, LiDAR sensor simulation results into nerfstudio format, suitable for training 3D Gaussian splatting reconstruction.
+
+The example output of camera and LiDAR poses in `frame_with_depth/transforms.json`.
 This is a living and active repository for taking in aiSim sensor JSON data and outputs a `transforms.json` file that's compatible for `nerfstudio` program. 
 
 ## Setup (Windows)
@@ -23,7 +31,7 @@ This is a living and active repository for taking in aiSim sensor JSON data and 
 
 
 ## `SIDE_NOTE`: **Run Nerfstudio training on Kenny PC**
-If you have the nerfstudio installed and ready to run, please use the following instruction (Especially on kenny pc).
+If you have the nerfstudio installed and ready to run, please use the following instruction (Especially on kenny pc, (internal PC name)).
 1. **Activate environment and setup paths**
 
    ```bat
@@ -127,4 +135,5 @@ python src/colorize_las_pointcloud.py \
   --lidar-to-world-convention nerfstudio \
   --output frame_with_depth/lidar_sensor_00002_colorized.ply
 ```
+
 
