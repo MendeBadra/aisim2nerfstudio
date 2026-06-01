@@ -109,3 +109,22 @@ TODO:
 
 NOTE:
 - LiDAR point clouds of the original sensor data can be found in `aisim_ns_dataset_lidar` folder. The files are named `ego_lidar_sensor_las.zip` and can be downloaded from [here](https://drive.google.com/file/d/1_w7j8nukf5RsJ7_D2PTrUMYs-NiL-0ff/view?usp=drive_link) to be extracted (My Drive > BME2025 > Project lab). 
+
+
+### Latest working command:
+
+```
+python src/colorize_las_pointcloud.py \
+  --las-path frame_with_depth/lidar_sensor_00002.las \
+  --transform frame_with_depth/transforms.json \
+  --images-root frame_with_depth/sample_jpgs \
+  --frame-index 0 \
+  --depth-threshold 0.01 \
+  --debug-stats \
+  --lidar-calibration-file calibrations/lidar_sensor.json \
+  --vehicle-sensor-file data/2025-12-04_18-22-25/ego/vehicle_sensor/vehicle_sensor_00002.json \
+  --lidar-sensor-type lidar_sensor \
+  --lidar-to-world-convention nerfstudio \
+  --output frame_with_depth/lidar_sensor_00002_colorized.ply
+```
+
