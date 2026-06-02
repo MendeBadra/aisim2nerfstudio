@@ -133,7 +133,7 @@ aisim2nerfstudio/
 
 TODO:
 
-- [x] colorize_las_pointcloud.py
+- [x] Write a `colorize_las_pointcloud.py` script
 - [ ] Resolve the issue with point cloud in the camera space after transformation being under the ceiling of the car.
 - [ ] Train a 3DGS on LiDAR
 
@@ -141,7 +141,7 @@ NOTE:
 - LiDAR point clouds of the original sensor data can be found in `aisim_ns_dataset_lidar` folder. The files are named `ego_lidar_sensor_las.zip` and can be downloaded from [here](https://drive.google.com/file/d/1_w7j8nukf5RsJ7_D2PTrUMYs-NiL-0ff/view?usp=drive_link) to be extracted (My Drive > BME2025 > Project lab). 
 
 
-### Latest working command:
+### Latest working command for `colorize_las_pointcloud.py`:
 
 ```
 python src/colorize_las_pointcloud.py \
