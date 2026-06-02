@@ -14,6 +14,8 @@ aisim_ns_dataset/*/
 aisim_ns_dataset_lidar/*/
 aisim_ns_dataset_lidar/*.zip
 
+# cool repo by Mindkosh
+colorize-lidar-pointcloud
 notebooks/*.json
 
 renders/

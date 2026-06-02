@@ -132,7 +132,7 @@ python src/colorize_las_pointcloud.py \
   --lidar-calibration-file calibrations/lidar_sensor.json \
   --vehicle-sensor-file data/2025-12-04_18-22-25/ego/vehicle_sensor/vehicle_sensor_00002.json \
   --lidar-sensor-type lidar_sensor \
-  --lidar-to-world-convention nerfstudio \
+  --lidar-to-world-convention aisim \
   --output frame_with_depth/lidar_sensor_00002_colorized.ply
 ```
 
