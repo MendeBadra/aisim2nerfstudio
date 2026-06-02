@@ -35,6 +35,7 @@ def pv_plot(points: np.ndarray):
     pl = pv.Plotter()
     pl.add_points(points, color="black", point_size=2, render_points_as_spheres=True)
     pl.add_axes()        # orientation widget
+    pl.add_axes_at_origin(labels_off=False, line_width=5)
     pl.show_grid()       # world grid
     pl.show()
 
@@ -220,10 +221,11 @@ def load_camera_views(transforms_path: Path, images_root: Path, frame_index: int
         image = np.array(Image.open(image_path).convert("RGB"))
         T_c2w = np.array(frame["transform_matrix"], dtype=np.float64)
         # permute the rows
+        # NOTE: check the note in calculation_for_transformsfile def nerfstudio
         T_c2w = T_c2w @ T_permutation
         # print(T_c2w)
         T_w2c = np.linalg.inv(T_c2w)
-        print(f"{frame['file_path']=} , \n {image_path=}")
+        # print(f"{frame['file_path']=} , \n {image_path=}")
         views.append(CameraView(
             image=image,
             fx=float(tf["fl_x"]),
@@ -315,10 +317,10 @@ def colorize_points(
         # T_lidar_to_camera = cam.T_w2c @ 
         points_camera = apply_transform_to_points(points_world, cam.T_w2c)
         # DEBUG
-        # pcd = o3d.geometry.PointCloud()
-        # pcd.points = o3d.utility.Vector3dVector(points_camera)
-        # coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=3.0, origin=[0, 0, 0])
-        # o3d.visualization.draw_geometries([pcd, coord_frame])
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(points_camera)
+        coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=3.0, origin=[0, 0, 0])
+        o3d.visualization.draw_geometries([pcd, coord_frame])
 
         # 2. Project 3D camera points to 2D pixel coordinates
         valid, depths, x_pix, y_pix = project_points(
@@ -426,7 +428,7 @@ def main() -> None:
     if args.lidar_calibration_file is not None and args.vehicle_sensor_file is not None:
         from calculation_for_transformsfile import calculate_transform_matrix
 
-        T_lidar_to_world_nerfstudio = calculate_transform_matrix(
+        T_lidar_to_world = calculate_transform_matrix(
             str(args.lidar_calibration_file),
             str(args.vehicle_sensor_file),
             args.lidar_sensor_type,
@@ -436,7 +438,8 @@ def main() -> None:
         # Turned out the calculate_transform_matrix returns in the nerfstudio format
         # Thus need to convert back to aiSim
         # NOTE: if args.lidar_to_world_convention == "nerfstudio"
-        T_lidar_to_world = T_lidar_to_world_nerfstudio @ T_permutation
+        if args.lidar_to_world_convention == "nerfstudio":
+            T_lidar_to_world = T_permutation @ T_lidar_to_world 
         
     elif args.lidar_calibration_file is not None or args.vehicle_sensor_file is not None:
         raise ValueError(
