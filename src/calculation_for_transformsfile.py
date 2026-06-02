@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import numpy as np
 import math
-from tqdm import tqdm
+# from tqdm import tqdm
 
 # aiSim uses column-major matrix, where the translation vector is the 4th column (index 3).
 # We will use a standard numpy (row-major) convention for readability, 
@@ -28,7 +28,7 @@ CAMERA_CALIBRATION_FILE = "calibrations/mend_front_back_2side_pinhole.json"
 # OUTPUT_DIR = "outputs/test0" # 2025.12.17 The fix needed
 OUTPUT_DIR = "outputs"
 
-FORMAT = "nerfstudio" # or "aisim" itself
+FORMAT = "nerfstudio" # or "aisim" itself for the convention variable
 OUTPUT = "json" # or "matrix" 
 TEST_NUM = 13
 # CAMERA_TYPE = "pinhole_duplicate0"
@@ -91,7 +91,11 @@ def get_sensor_position_rotation(camera_calibration_file, camera_type = CAMERA_T
         input_data = json.load(f)
     # 1. Navigate to the core camera configuration block
         try:
-            camera_config = input_data['sensors'][CAMERA_TYPE]['camera_config']
+            if camera_type != "lidar_sensor":
+                camera_config = input_data['sensors'][camera_type]['camera_config']
+            else:
+                camera_config = input_data['sensors'][camera_type]['mounting']
+            print(camera_config.keys())
             relative_sensor_position = camera_config['position'] # this is body space position. Is not the absolute position
             relative_sensor_rotation = camera_config['rotation']
             
@@ -185,36 +189,42 @@ def reshape_rt_transform(rt_transform_array):
 
 def nerfstudio_conversion(T_matrix):
     # CHECK the nerfstudio convention here: https://docs.nerf.studio/quickstart/data_conventions.html
-    # +X is right, +Y is up, and +Z is pointing back and away from the camera.
-    # whereas in aisim it's +X is forward, +Y is left, +Z is up.
+    # nerfstudio: +X is right, +Y is up, and +Z is pointing back and away from the camera.
+    # whereas in aisim: it's +X is forward, +Y is left, +Z is up.
     # To show that the permutation matrix is correct, consider the following chart:
     # AISIM axis | Meaning | Nerfstudio equivalent
     #   +X       | forward |     -Z (because +Z is backwards)
-    #   +Y       | left    |     -X 
+    #   +Y       | left    |     -X (because +X is right)
     #   +Z       |  up     |     +Y       and thus the permutation matrix transforms AISIM col to nerfstudio column.
-    T_converted = np.zeros((4, 4))
-    T_rotation = T_matrix[:3, :3]
+    # 
+    # Think of aligning the AISIM axis onto conforming Nerfstudio format. To do that you need to
+    # swap/permute some rows
+    # T_converted = np.zeros((4, 4))
+    # T_rotation = T_matrix[:3, :3]
     T_permutation = np.array([ # this is for the conversion between coordinate systems
-        [0, 0, -1],
-        [-1, 0, 0],
-        [0, 1, 0]
+        [0, 0, -1, 0],
+        [-1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 1]
         ])
-    
-    T_rotation_converted = T_rotation @ T_permutation
-    position_vec = T_matrix[:3, 3]
-    position_vec_converted = position_vec# @ T_permutation
-    T_converted[:3, :3] = T_rotation_converted
-    T_converted[:3, 3] = position_vec_converted
-    T_converted[3, 3] = 1.0
+    # NOTE: I may have made a mistake. first line was the original.
+    # second one is the change that I'm contemplating.
+    T_converted = T_matrix @ T_permutation
+    T_converted = T_permutation @ T_matrix
+    # position_vec = T_matrix[:3, 3]
+    # position_vec_converted = position_vec# @ T_permutation
+    # T_converted[:3, :3] = T_rotation_converted
+    # T_converted[:3, 3] = position_vec_converted
+    # T_converted[3, 3] = 1.0
     # print(T_converted)
     return T_converted
 
-def calculate_transform_matrix(camera_calibration_file, vehicle_sensor_file):
+def calculate_transform_matrix(sensor_calibration_file, vehicle_sensor_file, sensor_type = CAMERA_TYPE, convention=FORMAT):
     """transform matrix like in the nerfstudio transforms.json
     NOTE: This is the main function that uses all of the functions defined."""
     # camera_calibration_file = "C:/aiSim/aiMotive/aisim_gui-5.7.0/data/calibrations/mend_front_back_2side_pinhole.json"
-    sensor_pos, sensor_rot = get_sensor_position_rotation(camera_calibration_file)
-    # print(pos, rot)
+    sensor_pos, sensor_rot = get_sensor_position_rotation(sensor_calibration_file, sensor_type)
+    print(f"{sensor_pos=}, {sensor_rot=}")
 
     # are these in degrees
     yaw, pitch, roll = sensor_rot['yaw'], sensor_rot['pitch'], sensor_rot['roll']
@@ -226,7 +236,7 @@ def calculate_transform_matrix(camera_calibration_file, vehicle_sensor_file):
     # print(f"T_ego_pom = \n {T_ego_pom}")
     # Doc: When a local coordinate is multiplied by the local POM, the result is a coordinate in the parent space
     T_sensor_to_world = T_ego_pom @ T_sensor_pom # world, ego, sensor
-    if FORMAT == "nerfstudio":
+    if convention == "nerfstudio":
         T_sensor_to_world = nerfstudio_conversion(T_sensor_to_world)
 
     return T_sensor_to_world # T for the ns representation
@@ -253,7 +263,7 @@ def main():
     print(f"[INFO] We've got {len(vehicle_sensor_files)} files found for vehicle_sensor*.json")
     frames = []
 
-    for vehicle_sensor_file in tqdm(vehicle_sensor_files):
+    for vehicle_sensor_file in vehicle_sensor_files:
         stem = vehicle_sensor_file.stem # filename without extension
         prefix = "vehicle_sensor_"
         if stem.startswith(prefix):
