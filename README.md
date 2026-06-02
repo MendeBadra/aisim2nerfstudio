@@ -9,7 +9,26 @@
 Convert **aiSim autonomous driving data** into **Nerfstudio** format for NeRF-based 3D reconstruction. This project aimed to convert aiSim automotive simulation software output sensor parameters such as vehicle position, orientation, camera position and orientation, LiDAR sensor simulation results into nerfstudio format, suitable for training 3D Gaussian splatting reconstruction.
 
 The example output of camera and LiDAR poses in `frame_with_depth/transforms.json`.
-This is a living and active repository for taking in aiSim sensor JSON data and outputs a `transforms.json` file that's compatible for `nerfstudio` program. 
+This is a living and active repository for taking in aiSim sensor JSON data and outputs a `transforms.json` file that's compatible for `nerfstudio` program.
+
+### LiDAR Colorization
+
+You can colorize a LiDAR point cloud using the camera images and the generated `transforms.json` file. This is useful for creating a colorized initialization for 3D Gaussian Splatting.
+
+```bash
+python src/colorize_las_pointcloud.py \
+    --las-path frame_with_depth/lidar_sensor_00002.las \
+    --transform aisim_ns_dataset/transforms.json \
+    --images-root aisim_ns_dataset \
+    --lidar-calibration-file calibrations/lidar_sensor.json \
+    --vehicle-sensor-file data/2025-12-04_18-22-25/ego/vehicle_sensor/vehicle_sensor_00002.json \
+    --output outputs/colorized_frame_00002.ply
+```
+
+**Key Features:**
+- **Occlusion Handling:** Uses a depth buffer to ensure points are only colored by visible cameras.
+- **Coordinate Conversion:** Handles the transformation between aiSim and Nerfstudio coordinate systems (X-forward vs. Z-forward).
+- **Batch Processing:** Can process multiple camera streams defined in a single `transforms.json`.
 
 ## Setup (Windows)
 
@@ -113,7 +132,10 @@ aisim2nerfstudio/
 * LiDAR integration
 
 TODO:
-[] lidar_pointcloud_to_initialization_colors.py
+
+- [x] colorize_las_pointcloud.py
+- [ ] Resolve the issue with point cloud in the camera space after transformation being under the ceiling of the car.
+- [ ] Train a 3DGS on LiDAR
 
 NOTE:
 - LiDAR point clouds of the original sensor data can be found in `aisim_ns_dataset_lidar` folder. The files are named `ego_lidar_sensor_las.zip` and can be downloaded from [here](https://drive.google.com/file/d/1_w7j8nukf5RsJ7_D2PTrUMYs-NiL-0ff/view?usp=drive_link) to be extracted (My Drive > BME2025 > Project lab). 
