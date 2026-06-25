@@ -1,9 +1,12 @@
 # aisim2nerfstudio
 
 **Update:** Presentation about this project is available [here](https://docs.google.com/presentation/d/17_WL6TLeuwyaKR0MYXG1tqEJ3wvr8QZncGu0y5wK8lk/edit?usp=sharing).
-
+**Update2:** LiDAR point cloud colorization (sensor fusion) is complete. Presentation is available [here](https://docs.google.com/presentation/d/1R3xKMMWFtAr1GCU7QUl6P-YqE67K_jQUBqln2EWJPts/edit?usp=sharing).
 
 <img width="1375" height="606" alt="image" src="https://github.com/user-attachments/assets/6a8c5ea4-5cbc-40e9-8f38-a22ef0e7fcaa" />
+
+LiDAR point cloud colorization result:
+<img width="1271" height="826" alt="image" src="https://github.com/user-attachments/assets/8555c419-d7f0-4cee-bff7-a58360684c2b" />
 
 
 Convert **aiSim autonomous driving data** into **Nerfstudio** format for NeRF-based 3D reconstruction. This project aimed to convert aiSim automotive simulation software output sensor parameters such as vehicle position, orientation, camera position and orientation, LiDAR sensor simulation results into nerfstudio format, suitable for training 3D Gaussian splatting reconstruction.
